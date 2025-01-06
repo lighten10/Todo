@@ -1,7 +1,8 @@
 const express = require('express');
 
 const app = express();
-const {createTodo, updateTodo} = require('./types');
+const {createTodo} = require('./types');
+const {updateTodo} = require('./types')
 const { todo } = require('./db');
 
 app.use(express.json());
@@ -41,24 +42,30 @@ app.get('/todos' , async (req,res) => {
 
 });
 
-app.put('completed' , async (req,res) => {
+app.put('/completed' , async (req,res) => {
     const updatePayload = req.body
-    const parsePayload = updateTodo.safeParse(updatePayload)
+    /*const parsePayload = updateTodo.safeParse(updatePayload)
     if(!parsePayload.success){
         res.status(411).json({
             msg : "You sent the worng data !! please check again"
         })
         return ;
-    }
+    } */
     //connect to Db and update todo
-    const updateTodo = todo.update({
-        _id : req.body.id
-    },{
-        completed : true
-    })
+    await todo.findByIdAndUpdate(
+        updatePayload.id,
+        { completed: true }
+        
+    );
 
     res.status(201).json({
         msg : "Todo Completed Successfully"
     })
 
 })
+
+const port = 3000;
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
